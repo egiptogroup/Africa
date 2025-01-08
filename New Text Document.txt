@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>رصد الزلازل في إفريقيا</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <style>
+        #map { width: 100%; height: 500px; }
+    </style>
+</head>
+<body>
+    <h1>رصد الزلازل في إفريقيا</h1>
+    <div id="map"></div>
+    <script>
+        // إنشاء الخريطة
+        var map = L.map('map').setView([0, 20], 3);  // مركز الخريطة على إفريقيا
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+        // جلب بيانات الزلازل
+        fetch('https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=2023-01-01&endtime=2023-12-31&minlatitude=-35&maxlatitude=37&minlongitude=-20&maxlongitude=55')
+            .then(response => response.json())
+            .then(data => {
+                data.features.forEach(quake => {
+                    var coords = quake.geometry.coordinates;
+                    var mag = quake.properties.mag;
+                    var place = quake.properties.place;
+                    L.marker([coords[1], coords[0]]).addTo(map)
+                        .bindPopup(`<b>${place}</b><br>القوة: ${mag}`);
+                });
+            });
+    </script>
+</body>
+</html>
